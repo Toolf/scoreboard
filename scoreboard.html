@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            user-select: none;
+            background-color: black;
+            font-family: sans-serif;
+            margin: 0;
+        }
+
+        *:focus {
+            outline: none;
+        }
+
+        /* Styles for athlete information */
+        .athlete-info {
+            padding: 0 0 0 20px;
+
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .athlete-name {
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: white;
+        }
+
+        #athlete1 {
+            background-color: rgb(26, 2, 2);
+        }
+
+        #athlete2 {
+            background-color: rgb(2, 10, 26);
+        }
+
+        /* Styles for scores */
+        .scores {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            /* Allow scores to wrap to the next line if needed */
+            width: 300px;
+        }
+
+        #athlete1 .scores {
+            color: rgb(180, 7, 7);
+        }
+
+        #athlete2 .scores {
+            color: rgb(7, 111, 180);
+        }
+
+        .score-info {
+            display: flex;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        .wathary {
+            margin-right: 10px;
+            display: flex;
+            align-items: center;
+            font-weight: bold;
+        }
+
+        .wathary-score,
+        .ipon {
+            font-weight: bold;
+            padding: 10px;
+            font-size: 2em;
+        }
+
+        .ipons {
+            display: flex;
+            align-items: center;
+            font-weight: bold;
+        }
+
+        .ipon {}
+
+        .total-score {
+            font-size: 5em;
+        }
+
+        .total-score,
+        .shido,
+        .chui {
+            font-weight: bold;
+            padding: 10px;
+            text-align: center;
+        }
+
+        .shido {
+            font-size: 1.5em;
+            background-color: rgb(170, 159, 9);
+            margin: 10px;
+            padding: 5px;
+            color: black;
+        }
+
+        .chui {
+            padding: 0;
+            color: rgba(0, 0, 0, 0);
+            font-size: 0.7em;
+        }
+
+        .chui-active {
+            padding: 0;
+            color: black;
+            background-color: rgb(170, 159, 9);
+        }
+
+
+        /* Styles for time and category */
+        #time-category {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        #time {
+            font-size: 4em;
+            font-weight: bold;
+            color: #333;
+            display: inline;
+        }
+
+        .time-active {
+            color: white !important;
+        }
+
+        #time-milliseconds {
+            color: #333;
+            display: inline;
+            font-size: 2em;
+            font-weight: bold;
+        }
+
+        #category {
+            font-size: 18px;
+            color: #555;
+        }
+
+        .edit-popup {
+            position: absolute;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 5em;
+            padding: 10px;
+            z-index: 1;
+            font-family: 'Arial', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .edit-popup input {
+            /* width: calc(100% - 25px); */
+            padding: 8px;
+            box-sizing: border-box;
+            border: none;
+        }
+
+        .edit-popup button {
+            background-color: rgb(170, 159, 9);
+            padding: 14px;
+            margin-left: 10px;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            top: 10px;
+            right: 10px;
+        }
+
+        .edit-popup button:hover {
+            background-color: rgb(141, 132, 9);
+        }
+
+        .full-ipon-message {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 100%;
+            background-color: rgb(170, 159, 9);
+            color: black;
+            text-align: center;
+            padding: 10px;
+            font-weight: bold;
+            font-size: 4em;
+            animation: blink 5s infinite;
+        }
+
+        @keyframes blink {
+            50% {
+                opacity: 0;
+            }
+        }
+
+        @media print {
+
+            .no-print,
+            .no-print * {
+                display: none !important;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="full-ipon-message no-print" id="full-ipon-message">FULL IPON</div>
+
+    <div class="athlete-info" id="athlete1">
+        <div class="edit-popup" id="edit-athlete1-popup" style="display: none;">
+            <input type="text" id="edit-athlete1-name" placeholder="Edit Athlete Name">
+            <button onclick="editAthleteName('athlete1')"></button>
+        </div>
+
+        <div class="athlete-name" id="athlete1-name" oncontextmenu="showEditPopup(event, 'athlete1')">N. SMIRNOV</div>
+        <div>
+            <div class="scores">
+                <div class="score-info">
+                    <div class="wathary">wa<div class="wathary-score" id="wathary-score-athlete1">0</div>
+                    </div>
+                    <div class="ipons">
+                        ip
+                        <div class="ipon ipon-first" id="iponFirst-athlete1">0</div>
+                        <div class="ipon ipon-second" id="iponSecond-athlete1">0</div>
+                        <div class="ipon ipon-third" id="iponThird-athlete1">0</div>
+                    </div>
+                </div>
+                <div class="total-score" id="total-score-athlete1">0</div>
+                <div class="shido" id="shido-athlete1">0</div>
+            </div>
+            <div class="chui" id="chui-athlete1">chui</div>
+        </div>
+    </div>
+
+    <div class="athlete-info" id="athlete2">
+        <div class="edit-popup" id="edit-athlete2-popup" style="display: none;">
+            <input type="text" id="edit-athlete2-name" placeholder="Edit Athlete Name">
+            <button onclick="editAthleteName('athlete2')"></button>
+        </div>
+        <div class="athlete-name" id="athlete2-name" oncontextmenu="showEditPopup(event, 'athlete2')">N. SMIRNOV</div>
+        <div>
+            <div class="scores">
+                <div class="score-info">
+                    <div class="wathary">wa<div class="wathary-score" id="wathary-score-athlete2">0</div>
+                    </div>
+                    <div class="ipons">
+                        ip
+                        <div class="ipon ipon-first" id="iponFirst-athlete2">0</div>
+                        <div class="ipon ipon-second" id="iponSecond-athlete2">0</div>
+                        <div class="ipon ipon-third" id="iponThird-athlete2">0</div>
+                    </div>
+                </div>
+                <div class="total-score" id="total-score-athlete2">0</div>
+                <div class="shido" id="shido-athlete2">0</div>
+            </div>
+            <div class="chui" id="chui-athlete2">chui</div>
+        </div>
+    </div>
+
+    <div id="time-category">
+        <div class="edit-popup" id="edit-category-popup" style="display: none;">
+            <input type="text" id="edit-category" placeholder="Edit Category">
+            <button onclick="editCategory()"></button>
+        </div>
+        <div id="time">03:00</div>
+        <div id="time-milliseconds">.0</div>
+        <div id="category" oncontextmenu="showEditPopup(event, 'category')">M +62KG</div>
+    </div>
+
+    <script>
+        // Sample athlete data
+        let athleteData = {
+            athlete1: {
+                name: "N. SMIRNOV",
+                watharyScore: 0,
+                iponFirst: 0,
+                iponSecond: 0,
+                iponThird: 0,
+                totalScore: 0,
+                shido: 0,
+                chuiActive: false,
+            },
+            athlete2: {
+                name: "Another Athlete",
+                watharyScore: 0,
+                iponFirst: 0,
+                iponSecond: 0,
+                iponThird: 0,
+                totalScore: 0,
+                shido: 0,
+                chuiActive: false,
+            },
+        };
+
+        // Sample timer data
+        let timerData = {
+            isRunning: false,
+            time: 3 * 60 * 1000,
+        };
+
+        // Sample category data
+        let categoryData = {
+            category: "M +62KG",
+        };
+
+        function other_athlete(athlete) {
+            return athlete == "athlete1" ? "athlete2" : "athlete1";
+        }
+
+        // Function to update the total score display
+        function updateTotalScoreDisplay(athleteId) {
+            const totalScoreElement = document.getElementById(`total-score-${athleteId}`);
+            if (totalScoreElement) {
+                // const { iponFirst, iponSecond, iponThird, watharyScore } = athleteData[athleteId];
+                // const { shido, chuiActive } = athleteData[other_athlete(athleteId)];
+
+                // Calculate the total score based on the specified formula
+                // const totalScore = iponFirst * 2 + iponSecond * 2 + iponThird * 2 + watharyScore + shido + (chuiActive ? 2 : 0);
+                const totalScore = athleteData[athleteId].totalScore;
+                totalScoreElement.textContent = totalScore;
+            }
+        }
+
+        // Function to update athlete's name
+        function updateAthleteName(athleteId, newName) {
+            const athleteNameElement = document.getElementById(`${athleteId}-name`);
+            if (athleteNameElement) {
+                athleteNameElement.textContent = newName;
+                athleteData[athleteId].name = newName;
+            }
+        }
+
+
+        // Function to update the timer display
+        function updateTimerDisplay() {
+            const timeElement = document.getElementById('time');
+            const timeElementMilliseconds = document.getElementById('time-milliseconds');
+            if (timeElement && timeElementMilliseconds) {
+                const minutes = Math.floor(timerData.time / 1000 / 60);
+                const seconds = Math.floor(timerData.time / 1000) % 60;
+                const milliseconds = timerData.time % 1000;
+                timeElement.textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+                timeElementMilliseconds.textContent = `.${Math.floor(milliseconds / 100)}`;
+            }
+        }
+
+        // Function to start/stop the timer
+        function toggleTimer() {
+            const timeElement = document.getElementById('time');
+
+            timerData.isRunning = !timerData.isRunning;
+            timeElement.classList.toggle('time-active');
+            if (timerData.isRunning) {
+                // Start the timer
+                timerInterval = setInterval(() => {
+                    timerData.time -= 100;
+                    timerData.time = Math.max(timerData.time, 0);
+                    updateTimerDisplay();
+                }, 100);
+            } else {
+                // Stop the timer
+                clearInterval(timerInterval);
+            }
+        }
+
+        // Function to reset the timer
+        function resetTimer() {
+            if (timerData.isRunning) {
+                toggleTimer();
+            }
+
+            timerData.isRunning = false;
+            timerData.time = 3 * 60 * 1000;
+            updateTimerDisplay();
+            clearInterval(timerInterval);
+        }
+
+        // Function to increase/decrease wathary score
+        function updateWatharyScore(athleteId, increment) {
+            const watharyScoreElement = document.getElementById(`wathary-score-${athleteId}`);
+            if (watharyScoreElement) {
+                athleteData[athleteId].watharyScore += increment;
+                athleteData[athleteId].totalScore += increment;
+                watharyScoreElement.textContent = athleteData[athleteId].watharyScore;
+                updateTotalScoreDisplay(athleteId);
+            }
+        }
+
+        // Function to check and display "FULL IPON" message
+        function checkAndDisplayFullIponMessage() {
+            const fullIponMessage = document.getElementById('full-ipon-message');
+
+            for (const athleteId in athleteData) {
+                const athlete = athleteData[athleteId];
+                if (athlete.iponFirst > 0 && athlete.iponSecond > 0 && athlete.iponThird > 0) {
+                    fullIponMessage.style.display = 'block';
+                    setTimeout(() => {
+                        fullIponMessage.style.display = 'none';
+                    }, 5000);
+                    return; // Stop checking once one athlete has "FULL IPON"
+                }
+            }
+
+            // Hide the message if no athlete has "FULL IPON"
+            fullIponMessage.style.display = 'none';
+        }
+
+        // Function to increase/decrease ipons score
+        function updateIponsScore(athleteId, iponType, increment) {
+            const iponElement = document.getElementById(`${iponType}-${athleteId}`);
+            if (iponElement) {
+                athleteData[athleteId][iponType] += increment;
+                athleteData[athleteId].totalScore += increment * 2;
+                iponElement.textContent = athleteData[athleteId][iponType];
+                updateTotalScoreDisplay(athleteId);
+                checkAndDisplayFullIponMessage();
+            }
+        }
+
+        // Function to increase/decrease shido
+        function updateShido(athleteId, increment) {
+            const shidoElement = document.getElementById(`shido-${athleteId}`);
+            if (shidoElement) {
+                athleteData[athleteId].shido += increment;
+                athleteData[other_athlete(athleteId)].totalScore += increment;
+                shidoElement.textContent = athleteData[athleteId].shido;
+                updateTotalScoreDisplay(other_athlete(athleteId));
+            }
+        }
+
+        // Function to increase/decrease total score
+        function updateTotalScore(athleteId, increment) {
+            const totalScoreElement = document.getElementById(`total-score-${athleteId}`);
+            if (totalScoreElement) {
+                athleteData[athleteId].totalScore += increment;
+                totalScoreElement.textContent = athleteData[athleteId].totalScore;
+            }
+        }
+
+        // Function to set/unset chui
+        function toggleChui(athleteId) {
+            console.log("toggleChui");
+            const chuiElement = document.getElementById(`chui-${athleteId}`);
+            if (chuiElement) {
+                athleteData[athleteId].chuiActive = !athleteData[athleteId].chuiActive;
+                athleteData[other_athlete(athleteId)].totalScore += athleteData[athleteId].chuiActive ? 2 : -2;
+                chuiElement.classList.toggle('chui-active', athleteData[athleteId].chuiActive);
+                updateTotalScoreDisplay(other_athlete(athleteId));
+            }
+        }
+
+        // Function to set category
+        function setCategory(newCategory) {
+            const categoryElement = document.getElementById('category');
+            if (categoryElement) {
+                categoryElement.textContent = newCategory;
+                categoryData.category = newCategory;
+            }
+        }
+
+        // Sample WebSocket implementation (adjust based on your actual implementation)
+        const socket = new WebSocket('ws://your-websocket-url');
+
+        socket.addEventListener('message', (event) => {
+            const data = JSON.parse(event.data);
+
+            // Handle WebSocket events and call the respective functions
+            switch (data.event) {
+                case 'updateAthleteName':
+                    updateAthleteName(data.athleteId, data.newName);
+                    break;
+                case 'toggleTimer':
+                    toggleTimer();
+                    break;
+                case 'updateWatharyScore':
+                    updateWatharyScore(data.athleteId, data.increment);
+                    break;
+                case 'updateIponsScore':
+                    updateIponsScore(data.athleteId, data.iponType, data.increment);
+                    break;
+                case 'updateShido':
+                    updateShido(data.athleteId, data.increment);
+                    break;
+                case 'toggleChui':
+                    toggleChui(data.athleteId);
+                    break;
+                case 'setCategory':
+                    setCategory(data.newCategory);
+                    break;
+                // Add more cases for other WebSocket events
+            }
+        });
+
+
+        // Function to handle mouse click events for wathary score
+        function handleWatharyScoreClick(athleteId, event) {
+            if (event.button === 0) {
+                // Left mouse button clicked, increase wathary score
+                updateWatharyScore(athleteId, 1);
+            } else if (event.button === 2) {
+                // Right mouse button clicked, decrease wathary score
+                updateWatharyScore(athleteId, -1);
+            }
+        }
+
+        // Function to handle mouse click events for ipon score
+        function handleIponScoreClick(athleteId, iponType, event) {
+            if (event.button === 0) {
+                // Left mouse button clicked, increase ipon score
+                updateIponsScore(athleteId, iponType, 1);
+            } else if (event.button === 2) {
+                // Right mouse button clicked, decrease ipon score
+                updateIponsScore(athleteId, iponType, -1);
+            }
+        }
+
+        // Function to handle mouse click events for shido
+        function handleShidoClick(athleteId, event) {
+            if (event.button === 0) {
+                // Left mouse button clicked, increase shido
+                updateShido(athleteId, 1);
+            } else if (event.button === 2) {
+                // Right mouse button clicked, decrease shido
+                updateShido(athleteId, -1);
+            }
+        }
+
+        function handleChuiClick(athleteId) {
+            toggleChui(athleteId);
+        }
+
+        // Function to handle mouse click events for total score
+        function handleTotalScoreClick(athleteId, event) {
+            console.log("CLICK");
+            if (event.button === 0) {
+                // Left mouse button clicked, increase shido
+                updateTotalScore(athleteId, 1);
+            } else if (event.button === 2) {
+                // Right mouse button clicked, decrease shido
+                updateTotalScore(athleteId, -1);
+            }
+        }
+
+        function handleTimeClick(event) {
+            const timeElement = document.getElementById(`time`);
+            if (event.button === 0) {
+                toggleTimer();
+            } else if (event.button === 2) {
+                resetTimer();
+            }
+        }
+
+
+
+        // Add event listeners for mouse clicks
+        document.getElementById('wathary-score-athlete1').addEventListener('mousedown', (event) => handleWatharyScoreClick('athlete1', event));
+        document.getElementById('iponFirst-athlete1').addEventListener('mousedown', (event) => handleIponScoreClick('athlete1', 'iponFirst', event));
+        document.getElementById('iponSecond-athlete1').addEventListener('mousedown', (event) => handleIponScoreClick('athlete1', 'iponSecond', event));
+        document.getElementById('iponThird-athlete1').addEventListener('mousedown', (event) => handleIponScoreClick('athlete1', 'iponThird', event));
+        document.getElementById('shido-athlete1').addEventListener('mousedown', (event) => handleShidoClick('athlete1', event));
+        document.getElementById('chui-athlete1').addEventListener('click', () => handleChuiClick('athlete1'));
+        document.getElementById('total-score-athlete1').addEventListener('mousedown', (event) => handleTotalScoreClick('athlete1', event));
+
+
+        document.getElementById('wathary-score-athlete2').addEventListener('mousedown', (event) => handleWatharyScoreClick('athlete2', event));
+        document.getElementById('iponFirst-athlete2').addEventListener('mousedown', (event) => handleIponScoreClick('athlete2', 'iponFirst', event));
+        document.getElementById('iponSecond-athlete2').addEventListener('mousedown', (event) => handleIponScoreClick('athlete2', 'iponSecond', event));
+        document.getElementById('iponThird-athlete2').addEventListener('mousedown', (event) => handleIponScoreClick('athlete2', 'iponThird', event));
+        document.getElementById('shido-athlete2').addEventListener('mousedown', (event) => handleShidoClick('athlete2', event));
+        document.getElementById('chui-athlete2').addEventListener('click', () => handleChuiClick('athlete2'));
+        document.getElementById('total-score-athlete2').addEventListener('mousedown', (event) => handleTotalScoreClick('athlete2', event));
+
+
+        document.getElementById('time').addEventListener('mousedown', (event) => handleTimeClick(event));
+
+
+        // Prevent the default context menu on right-click for specific elements
+        function preventContextMenu(event) {
+            event.preventDefault();
+        }
+
+        // Add event listener to prevent context menu on right-click for relevant elements
+        document.addEventListener('contextmenu', preventContextMenu);
+
+
+
+        // Function to edit athlete name
+        function editAthleteName(athleteId) {
+            const editInput = document.getElementById(`edit-${athleteId}-name`);
+            const athleteNameElement = document.getElementById(`${athleteId}-name`);
+            const editPopup = document.getElementById(`edit-${athleteId}-popup`);
+
+            if (editInput && athleteNameElement && editPopup) {
+                const newName = editInput.value.trim();
+                athleteData[athleteId].name = newName;
+                athleteNameElement.textContent = newName;
+                editInput.value = ""; // Clear the input after updating
+                editPopup.style.display = "none"; // Hide the edit popup
+            }
+        }
+
+        // Function to edit category
+        function editCategory() {
+            const editInput = document.getElementById('edit-category');
+            const categoryElement = document.getElementById('category');
+            const editPopup = document.getElementById('edit-category-popup');
+
+            if (editInput && categoryElement && editPopup) {
+                const newCategory = editInput.value.trim();
+                categoryData.category = newCategory;
+                categoryElement.textContent = newCategory;
+                editInput.value = ""; // Clear the input after updating
+                editPopup.style.display = "none"; // Hide the edit popup
+            }
+        }
+        // Function to show edit popup on right-click
+        function showEditPopup(event, elementId) {
+            const editPopup = document.getElementById(`edit-${elementId}-popup`);
+
+            if (editPopup) {
+                event.preventDefault(); // Prevent the default context menu
+                editPopup.style.display = "flex";
+                editPopup.style.left = `${event.pageX}px`;
+                editPopup.style.top = `${event.pageY}px`;
+            }
+        }
+
+        // Close the edit popups when clicking outside
+        document.addEventListener('click', function (event) {
+            const editPopups = document.querySelectorAll('.edit-popup');
+            editPopups.forEach((popup) => {
+                if (!popup.contains(event.target)) {
+                    popup.style.display = 'none';
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>
